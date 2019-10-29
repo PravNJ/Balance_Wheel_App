@@ -5,6 +5,6 @@ account: balancewheel
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1392849
-bundleId: 2546385
+bundleId: 2546527
 url: https://balancewheel.shinyapps.io/balancewheelapp/
-when: 1572323994.0466
+when: 1572328940.23081
