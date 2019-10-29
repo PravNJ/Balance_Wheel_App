@@ -10,13 +10,12 @@
 library(shiny)
 library(fmsb)
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
     titlePanel("Balance Wheel Prototype"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with a slider input
     sidebarLayout(
         sidebarPanel(
             sliderInput("love",
@@ -73,7 +72,7 @@ ui <- fluidPage(
 
 )
 
-# Define server logic required to draw a histogram
+# Define server logic
 server <- function(input, output) {
 
     output$distPlot <- renderPlot({
@@ -91,22 +90,24 @@ server <- function(input, output) {
         data <- as.data.frame(matrix(c(var1,var2,var3,var4,var5,var6,var7,var8),ncol=8))
         colnames(data) <- c("Love" , "Mental Health" , "Community" , "Family" , "Career", "Money" , "Physical Health" , "Purpose" )
         
-        # To use the fmsb package, I have to add 2 lines to the dataframe: the max and min of each topic to show on the plot!
+        # Max and min of the radar plot
         data <- rbind(rep(11,8) , rep(0,8) , data)
         
-        # Check your data, it has to look like this!
-        # head(data)
+    
         
         # The default radar chart 
-        radarchart(data)
+        radarchart( data  , axistype=1 , 
+                    
+                    #custom polygon
+                    pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 , 
+                    
+                    #custom the grid
+                    cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,20,5), cglwd=0.8,
+                    
+                    #custom labels
+                    vlcex=0.8 
+        )
         
-        
-        # generate bins based on input$bins from ui.R
-        #x    <- faithful[, 2]
-        #bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        #hist(x, breaks = bins, col = 'darkgray', border = 'white')
     })
 }
 
