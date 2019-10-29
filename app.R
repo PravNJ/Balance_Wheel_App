@@ -1,19 +1,36 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
-library(fmsb)
+library(fmsb) #For radar chart
+
+
+
+fields <- c("love", "mentalhealth", "community","family","career","money","physicalhealth","purpose","email")
+
+# Save a response
+# ---- This is one of the two functions we will change for every storage type ----
+saveData <- function(data) {
+    data <- as.data.frame(t(data))
+    if (exists("responses")) {
+        responses <<- rbind(responses, data)
+    } else {
+        responses <<- data
+    }
+}
+
+# Load all previous responses
+# ---- This is one of the two functions we will change for every storage type ----
+loadData <- function() {
+    if (exists("responses")) {
+        responses
+    }
+}
 
 ui <- fluidPage(
 
+    
+    DT::dataTableOutput("responses", width = 300), tags$hr(),
+    
     # Application title
-    titlePanel("Balance Wheel Prototype"),
+    titlePanel("Balance Wheel by Coverhero"),
 
     # Sidebar with a slider input
     sidebarLayout(
@@ -58,6 +75,8 @@ ui <- fluidPage(
                         min = 1,
                         max = 10,
                         value = 1),
+            textInput("email", "Email", ""),
+            actionButton("submit", "Submit")
             
         ),
 
@@ -92,24 +111,47 @@ server <- function(input, output) {
         colnames(data) <- c("Love" , "Mental Health" , "Community" , "Family" , "Career", "Money" , "Physical Health" , "Purpose" )
         
         # Max and min of the radar plot
-        data <- rbind(rep(11,8) , rep(0,8) , data)
+        data <- rbind(rep(10,8) , rep(1,8) , data)
         
     
         
         # The default radar chart 
         radarchart( data  , axistype=1 , 
                     
+                    #number of segments in scale
+                    seg=10,
+                    
                     #custom polygon
-                    pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 , 
+                    pcol=rgb(228, 68, 167,max=255), pfcol=rgb(0,213,155,max=255) , plwd=4 , 
+                    
+                    #pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 , 
                     
                     #custom the grid
-                    cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,20,5), cglwd=0.8,
+                    cglcol="grey", cglty=1, axislabcol="grey", caxislabels=c("","","","","","","","","",""), cglwd=0.8,
                     
                     #custom labels
                     vlcex=0.8 
         )
         
-    },height = 400, width = 600)
+        # Whenever a field is filled, aggregate all form data
+        formData <- reactive({
+            data <- sapply(fields, function(x) input[[x]])
+            data
+        })
+        
+        # When the Submit button is clicked, save the form data
+        observeEvent(input$submit, {
+            saveData(formData())
+        })
+        
+        # Show the previous responses
+        # (update with current response when Submit is clicked)
+        output$responses <- DT::renderDataTable({
+            input$submit
+            loadData()
+        })     
+        
+    })
 }
 
 # Run the application 
