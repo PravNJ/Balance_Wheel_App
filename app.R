@@ -63,6 +63,7 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
+           #plotOutput("distPlot", width = "50%")
            plotOutput("distPlot")
         )
     ),
@@ -108,7 +109,7 @@ server <- function(input, output) {
                     vlcex=0.8 
         )
         
-    })
+    },height = 400, width = 600)
 }
 
 # Run the application 
